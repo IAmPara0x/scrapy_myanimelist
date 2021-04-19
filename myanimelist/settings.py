@@ -16,24 +16,27 @@ NEWSPIDER_MODULE = 'myanimelist.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'myanimelist (+http://www.yourdomain.com)'
+# USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
+# PROXY_POOL_PAGE_RETRY_TIMES = 1
+# PROXY_POOL_FILTER_TYPES = "https"
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 60/60.0
+DOWNLOAD_DELAY = 180/60.0
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
-CONCURRENT_REQUESTS_PER_IP = 60
+CONCURRENT_REQUESTS_PER_IP = 30
 
-RANDOMIZE_DOWNLOAD_DELAY = False
-
+RANDOMIZE_DOWNLOAD_DELAY = True
+# HTTPCACHE_ENABLED = True
+# PROXY_POOL_FILTER_CODE = "IND"
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
 
@@ -57,6 +60,15 @@ RANDOMIZE_DOWNLOAD_DELAY = False
 #DOWNLOADER_MIDDLEWARES = {
 #    'myanimelist.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
+PROXY_POOL_ENABLED = True
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 1
+    # 'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
+    # 'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
+}
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -69,14 +81,14 @@ RANDOMIZE_DOWNLOAD_DELAY = False
 ITEM_PIPELINES = {
    'myanimelist.pipelines.ProcessPipeline': 300,
    'myanimelist.pipelines.SaveLocalPipeline': 301,
-   'myanimelist.pipelines.SaveMongoPipeline': 302,   
+   'myanimelist.pipelines.SaveMongoPipeline': 302,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
-#AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-#AUTOTHROTTLE_START_DELAY = 5
+# AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
 #AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to

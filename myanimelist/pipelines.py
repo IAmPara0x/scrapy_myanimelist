@@ -36,12 +36,12 @@ class ProcessPipeline(object):
         item['score'] = np.nan
       else:
         item['score'] = float(item['score'].replace("\n", "").strip())
-      
+
       if item['ranked'] == 'N/A':
         item['ranked'] = np.nan
       else:
         item['ranked']     = int(item['ranked'].replace("#", "").strip())
-      
+
       item['popularity'] = int(item['popularity'].replace("#", "").strip())
       item['members']    = int(item['members'].replace(",", "").strip())
       item['episodes']   = item['episodes'].replace(",", "").strip()
@@ -92,11 +92,13 @@ class SaveMongoPipeline(object):
       if self.is_configured:
         self.client  = MongoClient(self.mongodb_url)
         self.db      = self.client['myanimelist']
-        
+
         self.collection = {}
         self.collection['AnimeItem']   = self.db.animes
         self.collection['ReviewItem']  = self.db.reviews
         self.collection['ProfileItem'] = self.db.profiles
+
+        # self.db.animes.createIndex({uid: })
 
     def close_spider(self, spider):
       self.client.close()
@@ -111,7 +113,12 @@ class SaveMongoPipeline(object):
       return item
 
     def save(self, item_class, item):
-      self.collection[item_class].insert_one(dict(item))
+      if item_class == "AnimeItem":
+        self.collection[item_class].replace_one({"uid": dict(item)["uid"]}, dict(item), upsert=True)
+      elif item_class == "ReviewItem":
+        self.collection[item_class].replace_one({"uid": dict(item)["uid"]}, dict(item), upsert=True)
+      elif item_class == "ProfileItem":
+        self.collection[item_class].replace_one({"profile": dict(item)["profile"]}, dict(item), upsert=True)
 
     @property
     def is_configured(self):
@@ -120,4 +127,4 @@ class SaveMongoPipeline(object):
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
-        return cls(settings.get('MONGODB_URL'))      
+        return cls(settings.get('MONGODB_URL'))
