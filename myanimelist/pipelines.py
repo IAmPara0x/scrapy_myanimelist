@@ -10,6 +10,7 @@ import os
 import numpy as np
 from myanimelist.items import AnimeItem, ReviewItem, ProfileItem
 from pymongo import MongoClient
+import pickle
 
 class ProcessPipeline(object):
 
@@ -85,8 +86,9 @@ class SaveLocalPipeline(object):
 
 
 class SaveMongoPipeline(object):
-    def __init__(self, mongodb_url = ""):
+    def __init__(self, mongodb_url = "", update_cache = ""):
         self.mongodb_url = mongodb_url
+        self.update_cache = update_cache
 
     def open_spider(self, spider):
       if self.is_configured:
@@ -98,7 +100,8 @@ class SaveMongoPipeline(object):
         self.collection['ReviewItem']  = self.db.reviews
         self.collection['ProfileItem'] = self.db.profiles
 
-        # self.db.animes.createIndex({uid: })
+        if self.update_cache == "True":
+          self._update_cache(self.db)
 
     def close_spider(self, spider):
       self.client.close()
@@ -113,6 +116,7 @@ class SaveMongoPipeline(object):
       return item
 
     def save(self, item_class, item):
+      # self.collection[item_class].insert_one(dict(item))
       if item_class == "AnimeItem":
         self.collection[item_class].replace_one({"uid": dict(item)["uid"]}, dict(item), upsert=True)
       elif item_class == "ReviewItem":
@@ -126,5 +130,36 @@ class SaveMongoPipeline(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        settings = crawler.settings
-        return cls(settings.get('MONGODB_URL'))
+      settings = crawler.settings
+      return cls(settings.get('MONGODB_URL'), settings.get("UPDATE_CACHE"))
+
+    def _update_cache(self, db):
+      print("===============================")
+      print("UPDATING CACHEFILE")
+      print("===============================")
+      anime_uids = {}
+      review_uids = {}
+      profile_names = {}
+
+      for doc in db.animes.find():
+        anime_uids[doc["uid"]] = 1
+
+      for doc in db.reviews.find():
+        review_uids[doc["uid"]] = 1
+
+      for doc in db.profiles.find():
+        profile_names[doc["profile"]] = 1
+
+
+      with open("cache/anime_uid.pkl", "wb") as f:
+        pickle.dump(anime_uids, f)
+
+      with open("cache/review_uid.pkl", "wb") as f:
+        pickle.dump(review_uids, f)
+
+      with open("cache/profile_names.pkl", "wb") as f:
+        pickle.dump(profile_names, f)
+
+      print("===============================")
+      print("DONE UPDATING CACHEFILES")
+      print("===============================")

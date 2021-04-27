@@ -24,15 +24,15 @@ ROBOTSTXT_OBEY = False
 # PROXY_POOL_PAGE_RETRY_TIMES = 1
 # PROXY_POOL_FILTER_TYPES = "https"
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# CONCURRENT_REQUESTS = 16
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 180/60.0
+DOWNLOAD_DELAY = 45/60.0
 # The download delay setting will honor only one of:
-#CONCURRENT_REQUESTS_PER_DOMAIN = 16
-CONCURRENT_REQUESTS_PER_IP = 30
+CONCURRENT_REQUESTS_PER_DOMAIN = 16
+# CONCURRENT_REQUESTS_PER_IP = 8
 
 RANDOMIZE_DOWNLOAD_DELAY = True
 # HTTPCACHE_ENABLED = True
@@ -60,15 +60,26 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    'myanimelist.middlewares.MyCustomDownloaderMiddleware': 543,
 #}
-PROXY_POOL_ENABLED = True
+# ROTATING_PROXY_BACKOFF_BASE = 30
+
+RETRY_TIMES = 6
+# ROTATING_PROXY_LIST_PATH = 'proxy-list.txt'
+# DOWNLOAD_TIMEOUT = 5
+# ROTATING_PROXY_PAGE_RETRY_TIMES = 10
+
+# ROTATING_PROXY_BAN_POLICY = 'myanimelist.policy.MyPolicy'
 
 DOWNLOADER_MIDDLEWARES = {
+    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    # 'scrapy_proxies.RandomProxy': 100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 1
-    # 'scrapy_proxy_pool.middlewares.ProxyPoolMiddleware': 610,
-    # 'scrapy_proxy_pool.middlewares.BanDetectionMiddleware': 620,
+    # 'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    # 'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+    'myanimelist.middlewares.RotatingProxies':610
 }
+
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
@@ -86,14 +97,14 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
-AUTOTHROTTLE_ENABLED = True
+# AUTOTHROTTLE_ENABLED = True
 # The initial download delay
 # AUTOTHROTTLE_START_DELAY = 5
 # The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
+# AUTOTHROTTLE_MAX_DELAY = 30
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+# AUTOTHROTTLE_TARGET_CONCURRENCY = 32.0
 # Enable showing throttling stats for every response received:
 #AUTOTHROTTLE_DEBUG = False
 

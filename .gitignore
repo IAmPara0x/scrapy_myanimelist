@@ -2,3 +2,8 @@
 .env
 __pycache__
 data/*
+cache/
+.ipynb_checkpoints/
+*.ipynb
+*.pkl
+*.txt
