@@ -1,5 +1,4 @@
 # myAnimeList Crawler
-
 This crawler can crawl anime, reviews and profiles information from [myAnimeList](myAnimeList.net) using [Scrapy Framework](https://scrapy.org/)
 
 ## Usage
@@ -7,11 +6,7 @@ This crawler can crawl anime, reviews and profiles information from [myAnimeList
 The main page to use for the crawler is 'https://myanimelist.net/topanime.php?limit=<limit>', this page groups all animes in order using rank information.
 The command to use a crawl uses '<limit>' parameters to filter page visits.
 
-```bash
-$ scrapy runspider myanimelist/spiders/MyAnimeList.py \
-  -a start_limit=<start_limit> \
-  -a end_limit=<end_limit> \
-```
+just run **scrape.sh**
 
 #### MongoDB
 
@@ -20,7 +15,7 @@ The crawller result can be saved to mongodb by using the parameter "MONGODB_URL"
 ```bash
 $ scrapy runspider myanimelist/spiders/MyAnimeList.py \
   -a start_limit=<start_limit> \
-  -a end_limit=<end_limit> \
+  -a USE_CACHED_PROXY=<bool>
   -s MONGODB_URL=<mongo_uri>
 ```
 
@@ -74,7 +69,11 @@ This project create 3 datasets
     "10721"
   ],
   "gender": "Female",
-  "birthday": "Nov 13"
+  "birthday": "Nov 13",
+  "currently watching anime" : [],
+  "completed anime" : [],
+  "dropped anime" : [],
+  "on hold anime" : []
 }
 ```
 
@@ -96,11 +95,7 @@ This project create 3 datasets
     "Character": "10",
     "Enjoyment": "9"
   },
-  "score": 9
+  "score": 9,
+  "helpful": 20
 }
-```
-
-## Kaggle 
-
-This dataset is put on [Kaggle](https://www.kaggle.com/marlesson/myanimelist-dataset-animes-profiles-reviews)
-
+`
